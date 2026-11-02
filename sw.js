@@ -1,4 +1,4 @@
-const CACHE_NAME = 'j2me-player-v2';
+const CACHE_NAME = 'j2me-player-v3';
 
 const STATIC_ASSETS = [
   './',
@@ -80,6 +80,11 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
   if (!url.protocol.startsWith('http')) return;
+
+  // CheerpJ requires native HTTP 206 Partial Content Range handling
+  if (event.request.headers.has('range') || url.pathname.endsWith('.jar') || url.pathname.endsWith('.wasm')) {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request, { ignoreSearch: false }).then((cachedResponse) => {

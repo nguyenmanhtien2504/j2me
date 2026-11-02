@@ -303,8 +303,12 @@ async function init() {
             },
             async Java_pl_zb3_freej2me_bridge_shell_Shell_setCanvasSize(lib, width, height) {
                 if (!scaleSet) {
-                    document.getElementById('loading').hidden = true;
-                    display.style.display = '';
+                    const loadingEl = document.getElementById('loading');
+                    if (loadingEl) {
+                        loadingEl.hidden = true;
+                        loadingEl.style.display = 'none';
+                    }
+                    display.style.display = 'block';
                     scaleSet = true;
                     display.focus();
                 }
