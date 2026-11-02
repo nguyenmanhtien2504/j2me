@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <title>J2ME Retro Player Pro - Chơi Game JAR Offline Toàn Màn Hình Ngang</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="description" content="Trình giả lập game Java J2ME (.jar) trực tiếp trên trình duyệt web, hỗ trợ offline 100%, cài về màn hình chính (PWA) và tự động full màn hình ngang.">
-  <meta name="keywords" content="j2me, java emulator, jar emulator, offline pwa, nokia games, bounce tales, retro games">
-  <meta name="theme-color" content="#070914">
+  <title>Ngọc Rồng Online - Chơi Trực Tiếp Trên Web (Toàn Màn Hình Ngang)</title>
+  <meta name="description" content="Chơi game Java Ngọc Rồng Online (NRO) trực tiếp trên trình duyệt web, không cần cài đặt, hỗ trợ cảm ứng và phím ảo full màn hình ngang.">
+  <meta name="theme-color" content="#060814">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="J2ME Player">
-
-  <!-- PWA Manifest & Icons -->
+  <meta name="apple-mobile-web-app-title" content="NRO Web">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" href="img/icon-192.png">
   <link rel="apple-touch-icon" href="img/icon-192.png">
@@ -19,194 +16,465 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
 
-  <!-- App Stylesheet -->
-  <link rel="stylesheet" href="style/app.css">
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --bg-panel: rgba(16, 20, 38, 0.92);
+      --primary: #ff9e00;
+      --primary-glow: rgba(255, 158, 0, 0.45);
+      --accent: #00d2ff;
+      --accent-glow: rgba(0, 210, 255, 0.4);
+      --key-bg: #1a1e36;
+      --key-border: #2a3158;
+      --key-text: #f0f3ff;
+      --key-active: #ff9e00;
+      --key-active-text: #050711;
+      --keypad-w: 200px;
+    }
 
-  <!-- Core J2ME / Emulator Dependencies -->
-  <script src="libs/encoding.js"></script>
-  <script src="bld/native.js" defer></script>
-  <script src="config/default.js" defer></script>
-  <script src="config/runtests.js" defer></script>
-  <script src="config/build.js" defer></script>
-  <script src="config/urlparams.js" defer></script>
-  <script src="bld/j2me.js" defer></script>
-  <script src="bld/main-all.js" defer></script>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
 
-  <!-- Main App Script -->
-  <script src="js/app.js" defer></script>
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: 'Outfit', sans-serif;
+      color: #fff;
+    }
+
+    /* Top Floating HUD */
+    #top-hud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      background: linear-gradient(180deg, rgba(7, 9, 19, 0.95) 0%, rgba(7, 9, 19, 0.5) 80%, transparent 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 100;
+      pointer-events: auto;
+    }
+
+    .brand-hud {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      color: #fff;
+      text-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .brand-hud .badge {
+      font-size: 0.65rem;
+      background: linear-gradient(135deg, #ff9e00, #ff5500);
+      color: #000;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hud-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-btn {
+      background: rgba(30, 36, 66, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .hud-btn:hover, .hud-btn:active {
+      background: var(--primary);
+      color: #000;
+      border-color: var(--primary);
+      box-shadow: 0 0 16px var(--primary-glow);
+      transform: translateY(-1px);
+    }
+
+    /* Screen Area */
+    #screen-area {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #11152c 0%, #060814 100%);
+      z-index: 10;
+    }
+
+    #display {
+      background-color: #000;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.85), 0 0 1px 1px rgba(255, 158, 0, 0.3);
+      border-radius: 4px;
+      outline: none;
+      max-width: 100vw;
+      max-height: 100vh;
+      cursor: crosshair;
+    }
+
+    /* Loading Screen */
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      z-index: 20;
+    }
+
+    .dragon-ball-spinner {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffdf70 0%, #ff9e00 60%, #c45b00 100%);
+      box-shadow: 0 0 35px var(--primary-glow), inset 0 0 12px rgba(255, 255, 255, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      animation: pulseBall 1.8s infinite ease-in-out;
+      margin-bottom: 20px;
+    }
+
+    @keyframes pulseBall {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 25px var(--primary-glow); }
+      50% { transform: scale(1.1); box-shadow: 0 0 45px rgba(255, 158, 0, 0.8); }
+    }
+
+    .loading-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+      text-shadow: 0 0 16px var(--primary-glow);
+    }
+
+    .loading-status {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      max-width: 320px;
+      line-height: 1.5;
+    }
+
+    .progress-pulse {
+      width: 200px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+      margin-top: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-pulse::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 40%;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      animation: slideProgress 1.4s infinite ease-in-out;
+    }
+
+    @keyframes slideProgress {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(300%); }
+    }
+
+    /* Keypads */
+    .keypad-part {
+      background: rgba(10, 13, 26, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 10px;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      z-index: 50;
+      transition: opacity 0.3s ease;
+    }
+
+    .key-grid {
+      display: grid;
+      gap: 8px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .left-grid {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+    }
+
+    .right-grid {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+    }
+
+    .key {
+      background: var(--key-bg);
+      color: var(--key-text);
+      border: 1px solid var(--key-border);
+      border-radius: 8px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background 0.08s, transform 0.05s, box-shadow 0.08s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+      line-height: 1.1;
+    }
+
+    .key span {
+      font-size: 0.55rem;
+      font-weight: 600;
+      margin-top: 2px;
+      color: #94a3b8;
+      letter-spacing: 0.5px;
+    }
+
+    .key:active, .key.active {
+      background: var(--key-active) !important;
+      color: var(--key-active-text) !important;
+      box-shadow: 0 0 16px var(--primary-glow);
+      transform: scale(0.92);
+    }
+
+    .key:active span, .key.active span {
+      color: rgba(0, 0, 0, 0.7) !important;
+    }
+
+    .arrow-key {
+      font-size: 1.6rem;
+      color: var(--accent);
+    }
+
+    .ok-key {
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, rgba(255, 158, 0, 0.25), rgba(255, 85, 0, 0.25));
+      border-color: rgba(255, 158, 0, 0.6);
+      color: #ffb732;
+    }
+
+    .action-key {
+      font-size: 0.95rem;
+      color: #38bdf8;
+    }
+
+    .small-key {
+      width: 80%;
+      height: 80%;
+      font-size: 0.8rem;
+      align-self: center;
+      justify-self: center;
+      padding: 2px;
+    }
+
+    /* Layout Positioning */
+    #left-keys, #right-keys {
+      display: none;
+      position: absolute;
+      bottom: 0;
+    }
+
+    #left-keys { left: 0; }
+    #right-keys { right: 0; }
+
+    body.kbd-landscape #left-keys,
+    body.kbd-landscape #right-keys {
+      display: flex;
+      width: var(--keypad-w);
+      height: 100%;
+      top: 0;
+      bottom: 0;
+    }
+
+    body.kbd-landscape #left-keys .key-grid,
+    body.kbd-landscape #right-keys .key-grid {
+      max-height: 380px;
+      margin-top: 24px;
+    }
+
+    body.kbd-landscape #screen-area {
+      left: var(--keypad-w);
+      right: var(--keypad-w);
+      top: 0;
+      bottom: 0;
+    }
+
+    body.kbd-portrait #left-keys,
+    body.kbd-portrait #right-keys {
+      display: flex;
+      width: 50%;
+      height: 230px;
+      bottom: 0;
+    }
+
+    body.kbd-portrait #screen-area {
+      bottom: 230px;
+      left: 0;
+      right: 0;
+      top: 44px;
+    }
+
+    /* Rotate Prompt */
+    #rotate-hint {
+      display: none;
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      color: #fbbf24;
+      z-index: 120;
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+    }
+
+    @media (orientation: portrait) and (max-width: 600px) {
+      #rotate-hint { display: block; }
+    }
+  </style>
 </head>
 
 <body>
-  <div class="app-wrapper">
-    
-    <!-- Top Navigation Bar -->
-    <header class="navbar">
-      <a href="./index.html" class="brand" aria-label="J2ME Player Home">
-        <img src="img/icon-192.png" alt="J2ME Logo" class="brand-icon">
-        <div class="brand-info">
-          <h1>J2ME RETRO PLAYER PRO</h1>
-          <p>Chạy Offline 100% • Tự Động Toàn Màn Hình Ngang</p>
-        </div>
-      </a>
-
-      <div class="nav-actions">
-        <!-- PWA Offline Badge -->
-        <span class="badge-offline" title="Ứng dụng sẵn sàng hoạt động khi không có mạng Internet">
-          OFFLINE SẴN SÀNG
-        </span>
-
-        <!-- PWA Install Button (Dynamic) -->
-        <button id="btn-install-pwa" class="btn-install-pwa" aria-label="Cài đặt về màn hình chính">
-          <span>📱</span> <span>Cài Đặt App</span>
-        </button>
-
-        <!-- Settings Button -->
-        <button id="btn-open-settings" class="btn-icon" title="Cài đặt hệ thống" aria-label="Cài đặt">
-          ⚙️
-        </button>
-      </div>
-    </header>
-
-    <!-- Main Hero / Drop Zone Section -->
-    <main>
-      <section class="hero-section" aria-label="Khu vực Import file game">
-        <div id="dropzone" class="dropzone-card" tabindex="0" role="button" aria-label="Kéo thả hoặc nhấp để tải file jar">
-          <div class="dropzone-icon-box">
-            🎮
-          </div>
-          <h2 class="dropzone-title">KÉO & THẢ FILE .JAR VÀO ĐÂY</h2>
-          <p class="dropzone-subtitle">
-            hoặc nhấp chuột vào đây để duyệt file game từ máy tính hoặc điện thoại của bạn.
-          </p>
-          <button type="button" class="btn-browse" onclick="document.getElementById('jar-file-input').click(); event.stopPropagation();">
-            <span>📂</span> <span>CHỌN FILE .JAR TỪ THIẾT BỊ</span>
-          </button>
-
-          <!-- Hidden File Input -->
-          <input type="file" id="jar-file-input" accept=".jar" multiple style="display: none;">
-
-          <!-- Feature Pills -->
-          <div class="feature-pills">
-            <span class="pill-item">⚡ Tự động mở toàn màn hình ngang</span>
-            <span class="pill-item">💾 Tự động lưu trữ offline (IndexedDB)</span>
-            <span class="pill-item">📱 Cài được về màn hình chính (PWA)</span>
-            <span class="pill-item">🎮 Hỗ trợ phím ảo & tay cầm Bluetooth</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Quick Actions & Preferences Bar -->
-      <section class="quick-bar" aria-label="Thanh tùy chọn nhanh">
-        <!-- Autoplay Toggle -->
-        <label class="toggle-label" title="Tự động mở full màn hình ngang ngay sau khi kéo thả file JAR">
-          <div class="toggle-switch">
-            <input type="checkbox" id="autoplay-toggle" checked>
-            <span class="toggle-slider"></span>
-          </div>
-          <span>⚡ Tự động chơi full màn hình ngang ngay khi import file</span>
-        </label>
-
-        <!-- Sample Game Buttons -->
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-          <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Game mẫu có sẵn:</span>
-          <button class="btn-sample-play" onclick="window.J2MEApp.installSample('BounceTales.jar')">
-            <span>🕹️</span> <span>Bounce Tales</span>
-          </button>
-          <button class="btn-sample-play" onclick="window.J2MEApp.installSample('pvz.jar')">
-            <span>🌻</span> <span>Plants vs Zombies</span>
-          </button>
-          <button class="btn-sample-play" onclick="window.J2MEApp.installSample('nfs13.jar')">
-            <span>🏎️</span> <span>Need For Speed</span>
-          </button>
-          <button class="btn-sample-play" onclick="window.J2MEApp.installSample('city.jar')">
-            <span>🏢</span> <span>City Bloxx</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Game Library Section -->
-      <section class="library-section" aria-label="Thư viện game đã cài đặt">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>THƯ VIỆN GAME CỦA BẠN</span>
-            <span id="game-count-badge" class="badge-count">0</span>
-          </h2>
-        </div>
-
-        <!-- Game Cards Grid -->
-        <div id="game-grid" class="game-grid">
-          <!-- Dynamically populated by js/app.js -->
-        </div>
-
-        <!-- Empty State (When no games yet) -->
-        <div id="empty-state" class="empty-state" style="display: none;">
-          <div class="empty-icon">🕹️</div>
-          <h3 class="empty-title">Chưa có game nào trong thư viện</h3>
-          <p class="empty-desc">
-            Hãy kéo thả file <strong>.jar</strong> vào ô bên trên hoặc bấm nút dưới để chơi ngay game mẫu huyền thoại <strong>Bounce Tales</strong>!
-          </p>
-          <button class="btn-browse" onclick="document.getElementById('btn-sample-game').click();">
-            <span>▶</span> <span>Chơi Ngay Bounce Tales</span>
-          </button>
-        </div>
-      </section>
-    </main>
-
-  </div>
-
-  <!-- Fullscreen Landscape Game Modal (Zero-reload execution) -->
-  <div id="game-modal" class="game-modal-container hidden" aria-label="Cửa sổ chơi game">
-    <button id="modal-exit-btn" class="modal-exit-btn" title="Thoát game (ESC)" onclick="window.J2MEApp.closeGameModal()">✕</button>
-    <iframe id="game-iframe" class="game-iframe" src="about:blank" allow="fullscreen; autoplay"></iframe>
-  </div>
-
-  <!-- Settings Modal Dialog -->
-  <div id="settings-modal" class="modal-backdrop" aria-hidden="true">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-      <div class="modal-header">
-        <h3 id="settings-title" class="modal-title">⚙️ Cài Đặt Hệ Thống J2ME</h3>
-        <button id="btn-close-settings" class="modal-close" aria-label="Đóng">✕</button>
-      </div>
-
-      <div class="modal-body">
-        <div style="margin-bottom: 18px;">
-          <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1;">
-            Chế độ nhân JVM (Engine Mode):
-          </label>
-          <select id="engine-mode-select" style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; color: #fff; font-family: inherit;">
-            <option value="enginemode1-classesold.jar">Nhân 1: Tương thích cao nhất (Nokia / MIDP 2.0 - Khuyên dùng)</option>
-            <option value="enginemode2-classes2.jar">Nhân 2: Tiêu chuẩn (Standard Mode)</option>
-            <option value="enginemode3-classes.jar">Nhân 3: Nâng cao (Preview Mode)</option>
-          </select>
-          <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-            Nếu game bị lỗi đồ họa hoặc không khởi động, hãy thử đổi sang nhân khác.
-          </p>
-        </div>
-
-        <div style="margin-bottom: 18px;">
-          <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1;">
-            Quản lý bộ nhớ Offline:
-          </label>
-          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
-            Các file JAR và dữ liệu lưu (RMS) được lưu trữ hoàn toàn trong trình duyệt (IndexedDB), không mất đi khi tải lại hoặc offline.
-          </p>
-          <button id="btn-clear-all-games" style="padding: 8px 14px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">
-            🗑 Xóa toàn bộ game trong máy
-          </button>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="document.getElementById('settings-modal').classList.remove('show');">
-          Đóng
-        </button>
-      </div>
+  <!-- Top Navigation & Controls HUD -->
+  <header id="top-hud">
+    <div class="brand-hud">
+      <span>🐉 NGỌC RỒNG ONLINE</span>
+      <span class="badge">OFFLINE PWA</span>
     </div>
-  </div>
 
-  <!-- Toast Notification Element -->
-  <div id="app-toast" class="app-toast" role="status" aria-live="polite"></div>
+    <div class="hud-actions">
+      <button id="btn-toggle-keypad" class="hud-btn" onclick="window.toggleKeypad()" title="Bật/Tắt Phím Ảo">
+        <span>🎮</span> <span>Phím Ảo</span>
+      </button>
+      <button id="btn-fullscreen" class="hud-btn" onclick="window.toggleFullscreen()" title="Toàn Màn Hình Ngang">
+        <span>⛶</span> <span>Toàn Màn Hình</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Rotate screen hint -->
+  <div id="rotate-hint">🔄 Xoay ngang điện thoại để chơi tốt nhất</div>
+
+  <!-- Central Display Canvas Container -->
+  <main id="screen-area">
+    <canvas tabindex="0" id="display" style="display: none;"></canvas>
+    
+    <div id="loading">
+      <div class="dragon-ball-spinner">⭐</div>
+      <h1 class="loading-title">NGỌC RỒNG ONLINE</h1>
+      <p class="loading-status" id="loading-text">Đang tải CheerpJ & khởi động game...</p>
+      <div class="progress-pulse"></div>
+    </div>
+  </main>
+
+  <!-- Left Keypad (1-9, *, 0, #) -->
+  <nav id="left-keys" class="keypad-part" aria-label="Bàn phím số bên trái">
+    <div class="key-grid left-grid">
+      <button data-key="Digit1" class="key">1</button>
+      <button data-key="Digit2" class="key">2 <span>ABC</span></button>
+      <button data-key="Digit3" class="key">3 <span>DEF</span></button>
+      <button data-key="Digit4" class="key">4 <span>GHI</span></button>
+      <button data-key="Digit5" class="key">5 <span>JKL</span></button>
+      <button data-key="Digit6" class="key">6 <span>MNO</span></button>
+      <button data-key="Digit7" class="key">7 <span>PQRS</span></button>
+      <button data-key="Digit8" class="key">8 <span>TUV</span></button>
+      <button data-key="Digit9" class="key">9 <span>WXYZ</span></button>
+      <button data-key="NumpadAsterisk" class="key">*</button>
+      <button data-key="Digit0" class="key">0 <span>+</span></button>
+      <button data-key="NumpadDivide" class="key">#</button>
+    </div>
+  </nav>
+
+  <!-- Right Keypad (Navigation & Actions) -->
+  <nav id="right-keys" class="keypad-part" aria-label="Phím điều hướng bên phải">
+    <div class="key-grid right-grid">
+      <button data-key="F1" class="key action-key" title="Phím mềm trái (Menu / Q)">L</button>
+      <button data-key="ArrowUp" class="key arrow-key" aria-label="Lên">▲</button>
+      <button data-key="F2" class="key action-key" title="Phím mềm phải (Đóng / W)">R</button>
+      <button data-key="ArrowLeft" class="key arrow-key" aria-label="Trái">◀</button>
+      <button data-key="Enter" class="key ok-key" aria-label="Chọn / Bắn">OK</button>
+      <button data-key="ArrowRight" class="key arrow-key" aria-label="Phải">▶</button>
+      <button data-key="Escape" class="key small-key" title="Thoát / Esc">Esc</button>
+      <button data-key="ArrowDown" class="key arrow-key" aria-label="Xuống">▼</button>
+      <button data-key="Maximize" class="key small-key" onclick="window.toggleFullscreen()" title="Toàn màn hình">⛶</button>
+    </div>
+  </nav>
+
+  <!-- Service Worker Registration for Offline PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          console.log('[SW] ServiceWorker registered with scope:', reg.scope);
+        }).catch((err) => {
+          console.warn('[SW] ServiceWorker registration failed:', err);
+        });
+      });
+    }
+
+    // Auto lock landscape on first touch/click
+    document.addEventListener('pointerdown', function requestLandscape() {
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(() => {});
+      }
+      document.removeEventListener('pointerdown', requestLandscape);
+    }, { once: true });
+  </script>
+
+  <!-- CheerpJ Engine & FreeJ2ME Launcher -->
+  <script src="https://cjrtnc.leaningtech.com/20260317_2978/loader.js"></script>
+  <script type="module" src="src/main.js"></script>
 </body>
 </html>

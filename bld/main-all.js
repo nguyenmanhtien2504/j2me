@@ -1582,7 +1582,21 @@ if (typeof module === "object") {
     if (!jar) {
       return null;
     }
-    var entry = jar.directory[fileName];
+    var clean = fileName.startsWith('/') ? fileName.substring(1) : fileName;
+    var entry = jar.directory[fileName] ||
+                jar.directory[clean] ||
+                jar.directory['/' + clean] ||
+                jar.directory['x1/' + clean] ||
+                jar.directory['x2/' + clean] ||
+                jar.directory['nrolite/' + clean] ||
+                jar.directory['data/' + clean] ||
+                jar.directory['data/nrolite/' + clean];
+    if (!entry && clean.startsWith('x1/')) {
+      entry = jar.directory[clean.substring(3)];
+    }
+    if (!entry && clean.startsWith('nrolite/')) {
+      entry = jar.directory[clean.substring(8)];
+    }
     if (!entry) {
       return null;
     }

@@ -22,14 +22,23 @@ const STATIC_ASSETS = [
   './config/urlparams.js',
   './bld/j2me.js',
   './bld/main-all.js',
-  './keymap.js',
-  './java/classesold.jar',
-  './java/classes2.jar',
-  './java/classes.jar',
-  './jar/BounceTales.jar',
-  './jar/pvz.jar',
-  './jar/nfs13.jar',
-  './jar/city.jar'
+  './freej2me-web.jar',
+  './init.zip',
+  './libjs/libcanvasfont.js',
+  './libjs/libcanvasgraphics.js',
+  './libjs/libgles2.js',
+  './libjs/libjsreference.js',
+  './libjs/libmediabridge.js',
+  './libjs/libmidibridge.js',
+  './libmedia/libmedia.js',
+  './libmidi/libmidi.js',
+  './libmidi/libmidi.wasm',
+  './libmidi/worklet.js',
+  './src/main.js',
+  './src/key.js',
+  './src/eventqueue.js',
+  './src/screenKbd.js',
+  './jar/nro.jar'
 ];
 
 // Install event - precache core files
