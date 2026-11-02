@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>J2ME Retro Player Pro - Chơi Game JAR Offline Toàn Màn Hình Ngang</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Trình giả lập game Java J2ME (.jar) trực tiếp trên trình duyệt web, hỗ trợ offline 100%, cài về màn hình chính (PWA) và tự động full màn hình ngang.">
+  <meta name="keywords" content="j2me, java emulator, jar emulator, offline pwa, nokia games, bounce tales, retro games">
+  <meta name="theme-color" content="#070914">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="J2ME Player">
+
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="img/icon-192.png">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="style/app.css">
+
+  <!-- Core J2ME / Emulator Dependencies -->
+  <script src="libs/encoding.js"></script>
+  <script src="bld/native.js" defer></script>
+  <script src="config/default.js" defer></script>
+  <script src="config/runtests.js" defer></script>
+  <script src="config/build.js" defer></script>
+  <script src="config/urlparams.js" defer></script>
+  <script src="bld/j2me.js" defer></script>
+  <script src="bld/main-all.js" defer></script>
+
+  <!-- Main App Script -->
+  <script src="js/app.js" defer></script>
+</head>
+
+<body>
+  <div class="app-wrapper">
+    
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <a href="./index.html" class="brand" aria-label="J2ME Player Home">
+        <img src="img/icon-192.png" alt="J2ME Logo" class="brand-icon">
+        <div class="brand-info">
+          <h1>J2ME RETRO PLAYER PRO</h1>
+          <p>Chạy Offline 100% • Tự Động Toàn Màn Hình Ngang</p>
+        </div>
+      </a>
+
+      <div class="nav-actions">
+        <!-- PWA Offline Badge -->
+        <span class="badge-offline" title="Ứng dụng sẵn sàng hoạt động khi không có mạng Internet">
+          OFFLINE SẴN SÀNG
+        </span>
+
+        <!-- PWA Install Button (Dynamic) -->
+        <button id="btn-install-pwa" class="btn-install-pwa" aria-label="Cài đặt về màn hình chính">
+          <span>📱</span> <span>Cài Đặt App</span>
+        </button>
+
+        <!-- Settings Button -->
+        <button id="btn-open-settings" class="btn-icon" title="Cài đặt hệ thống" aria-label="Cài đặt">
+          ⚙️
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Hero / Drop Zone Section -->
+    <main>
+      <section class="hero-section" aria-label="Khu vực Import file game">
+        <div id="dropzone" class="dropzone-card" tabindex="0" role="button" aria-label="Kéo thả hoặc nhấp để tải file jar">
+          <div class="dropzone-icon-box">
+            🎮
+          </div>
+          <h2 class="dropzone-title">KÉO & THẢ FILE .JAR VÀO ĐÂY</h2>
+          <p class="dropzone-subtitle">
+            hoặc nhấp chuột vào đây để duyệt file game từ máy tính hoặc điện thoại của bạn.
+          </p>
+          <button type="button" class="btn-browse" onclick="document.getElementById('jar-file-input').click(); event.stopPropagation();">
+            <span>📂</span> <span>CHỌN FILE .JAR TỪ THIẾT BỊ</span>
+          </button>
+
+          <!-- Hidden File Input -->
+          <input type="file" id="jar-file-input" accept=".jar" multiple style="display: none;">
+
+          <!-- Feature Pills -->
+          <div class="feature-pills">
+            <span class="pill-item">⚡ Tự động mở toàn màn hình ngang</span>
+            <span class="pill-item">💾 Tự động lưu trữ offline (IndexedDB)</span>
+            <span class="pill-item">📱 Cài được về màn hình chính (PWA)</span>
+            <span class="pill-item">🎮 Hỗ trợ phím ảo & tay cầm Bluetooth</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Actions & Preferences Bar -->
+      <section class="quick-bar" aria-label="Thanh tùy chọn nhanh">
+        <!-- Autoplay Toggle -->
+        <label class="toggle-label" title="Tự động mở full màn hình ngang ngay sau khi kéo thả file JAR">
+          <div class="toggle-switch">
+            <input type="checkbox" id="autoplay-toggle" checked>
+            <span class="toggle-slider"></span>
+          </div>
+          <span>⚡ Tự động chơi full màn hình ngang ngay khi import file</span>
+        </label>
+
+        <!-- Sample Game Buttons -->
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Game mẫu có sẵn:</span>
+          <button class="btn-sample-play" onclick="window.J2MEApp.installSample('BounceTales.jar')">
+            <span>🕹️</span> <span>Bounce Tales</span>
+          </button>
+          <button class="btn-sample-play" onclick="window.J2MEApp.installSample('pvz.jar')">
+            <span>🌻</span> <span>Plants vs Zombies</span>
+          </button>
+          <button class="btn-sample-play" onclick="window.J2MEApp.installSample('nfs13.jar')">
+            <span>🏎️</span> <span>Need For Speed</span>
+          </button>
+          <button class="btn-sample-play" onclick="window.J2MEApp.installSample('city.jar')">
+            <span>🏢</span> <span>City Bloxx</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Game Library Section -->
+      <section class="library-section" aria-label="Thư viện game đã cài đặt">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>THƯ VIỆN GAME CỦA BẠN</span>
+            <span id="game-count-badge" class="badge-count">0</span>
+          </h2>
+        </div>
+
+        <!-- Game Cards Grid -->
+        <div id="game-grid" class="game-grid">
+          <!-- Dynamically populated by js/app.js -->
+        </div>
+
+        <!-- Empty State (When no games yet) -->
+        <div id="empty-state" class="empty-state" style="display: none;">
+          <div class="empty-icon">🕹️</div>
+          <h3 class="empty-title">Chưa có game nào trong thư viện</h3>
+          <p class="empty-desc">
+            Hãy kéo thả file <strong>.jar</strong> vào ô bên trên hoặc bấm nút dưới để chơi ngay game mẫu huyền thoại <strong>Bounce Tales</strong>!
+          </p>
+          <button class="btn-browse" onclick="document.getElementById('btn-sample-game').click();">
+            <span>▶</span> <span>Chơi Ngay Bounce Tales</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <!-- Fullscreen Landscape Game Modal (Zero-reload execution) -->
+  <div id="game-modal" class="game-modal-container hidden" aria-label="Cửa sổ chơi game">
+    <button id="modal-exit-btn" class="modal-exit-btn" title="Thoát game (ESC)" onclick="window.J2MEApp.closeGameModal()">✕</button>
+    <iframe id="game-iframe" class="game-iframe" src="about:blank" allow="fullscreen; autoplay"></iframe>
+  </div>
+
+  <!-- Settings Modal Dialog -->
+  <div id="settings-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="modal-header">
+        <h3 id="settings-title" class="modal-title">⚙️ Cài Đặt Hệ Thống J2ME</h3>
+        <button id="btn-close-settings" class="modal-close" aria-label="Đóng">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1;">
+            Chế độ nhân JVM (Engine Mode):
+          </label>
+          <select id="engine-mode-select" style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; color: #fff; font-family: inherit;">
+            <option value="enginemode1-classesold.jar">Nhân 1: Tương thích cao nhất (Nokia / MIDP 2.0 - Khuyên dùng)</option>
+            <option value="enginemode2-classes2.jar">Nhân 2: Tiêu chuẩn (Standard Mode)</option>
+            <option value="enginemode3-classes.jar">Nhân 3: Nâng cao (Preview Mode)</option>
+          </select>
+          <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+            Nếu game bị lỗi đồ họa hoặc không khởi động, hãy thử đổi sang nhân khác.
+          </p>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1;">
+            Quản lý bộ nhớ Offline:
+          </label>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+            Các file JAR và dữ liệu lưu (RMS) được lưu trữ hoàn toàn trong trình duyệt (IndexedDB), không mất đi khi tải lại hoặc offline.
+          </p>
+          <button id="btn-clear-all-games" style="padding: 8px 14px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            🗑 Xóa toàn bộ game trong máy
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="document.getElementById('settings-modal').classList.remove('show');">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Element -->
+  <div id="app-toast" class="app-toast" role="status" aria-live="polite"></div>
+</body>
+</html>

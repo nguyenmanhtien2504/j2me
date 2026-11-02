@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>J2ME Player Pro - Toàn Màn Hình Ngang</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#050711">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="style/player.css">
+  
+  <!-- Emulator core dependencies -->
+  <script src="libs/encoding.js"></script>
+  <script src="./libs/webaudio-tinysynth.min.js"></script> 
+  <script src="./libs/BenzAMRRecorder.min.js"></script> 
+ 
+  <script type="text/javascript" src="bld/native.js" defer></script>
+  <script type="text/javascript" src="config/default.js" defer></script>
+  <script type="text/javascript" src="config/runtests.js" defer></script>
+  <script type="text/javascript" src="config/build.js" defer></script>
+  <script type="text/javascript" src="config/urlparams.js" defer></script>
+  <script type="text/javascript" src="bld/j2me.js" defer></script>
+  <script type="text/javascript" src="bld/main-all.js" defer></script>
+</head>
+
+<body>
+  <input id="File" type="file" style="display:none;">
+
+  <!-- Top Floating HUD -->
+  <header id="top-hud">
+    <button id="hud-btn-exit" class="hud-btn primary" title="Quay lại thư viện game">
+      <span>⬅</span> <span>Thư Viện</span>
+    </button>
+    <button id="hud-btn-fullscreen" class="hud-btn" title="Bật/Tắt Toàn Màn Hình">
+      <span>⛶</span>
+    </button>
+    <button id="hud-btn-rotate" class="hud-btn" title="Xoay ngang màn hình">
+      <span>🔄</span>
+    </button>
+    <button id="hud-btn-sound" class="hud-btn" title="Bật/Tắt âm thanh">
+      <span>🔊</span>
+    </button>
+    <button id="hud-btn-numpad" class="hud-btn" title="Mở bàn phím số (1-9, *, #)">
+      <span>⌨ 123</span>
+    </button>
+    <button id="hud-btn-opacity" class="hud-btn" title="Thay đổi độ mờ phím ảo">
+      <span>🎮</span>
+    </button>
+  </header>
+
+  <!-- Main Game Viewport (Landscape Layout) -->
+  <main id="game-viewport">
+    
+    <!-- Left Controls Pad -->
+    <section class="controls-pad" id="left-controls" aria-label="Điều khiển bên trái">
+      <!-- Softkey 1 (Menu / L) -->
+      <div class="softkey-row">
+        <button class="softkey left game-key" data-code="soft-left" aria-label="Phím mềm trái (Menu / Q)">
+          <span>L</span> <span>MENU</span>
+        </button>
+      </div>
+
+      <!-- 8-Way D-Pad -->
+      <div class="dpad-container" id="virtual-dpad" aria-label="Cần điều hướng 8 chiều">
+        <button class="dpad-btn dpad-up" data-code="up" aria-label="Lên">▲</button>
+        <button class="dpad-btn dpad-down" data-code="down" aria-label="Xuống">▼</button>
+        <button class="dpad-btn dpad-left" data-code="left" aria-label="Trái">◀</button>
+        <button class="dpad-btn dpad-right" data-code="right" aria-label="Phải">▶</button>
+        <button class="dpad-btn dpad-center" data-code="ok" aria-label="OK">OK</button>
+      </div>
+
+      <!-- Call Key (Green) -->
+      <div class="aux-row">
+        <button class="aux-btn call game-key" data-code="call" aria-label="Phím Gọi">
+          📞 GỌI
+        </button>
+      </div>
+    </section>
+
+    <!-- Center Display / Canvas Container -->
+    <section id="display-container" aria-label="Màn hình game">
+      <div id="display">
+        <div id="header"></div>
+        <canvas id="canvas" tabindex="0"></canvas> 
+        
+        <div id="download-screen" class="screen">
+          <h1 class="title">Đang tải MIDlet…</h1>
+          <div class="download-progress-container">
+            <progress class="pack-activity" id="download-bar" value="0" max="100"></progress>
+          </div>
+        </div>
+
+        <div id="splash-screen" class="screen">
+          <h1 class="title">Đang khởi động Game…</h1>
+          <div class="splash-progress-container">
+            <progress></progress>
+          </div>
+        </div>
+
+        <div id="exit-screen" class="screen"></div>
+        <div id="background-screen"></div>  
+      </div> 
+    </section>
+
+    <!-- Right Controls Pad -->
+    <section class="controls-pad" id="right-controls" aria-label="Điều khiển bên phải">
+      <!-- Softkey 2 (Back / R) -->
+      <div class="softkey-row">
+        <button class="softkey right game-key" data-code="soft-right" aria-label="Phím mềm phải (Trở về / E)">
+          <span>BACK</span> <span>R</span>
+        </button>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-pad">
+        <button class="action-btn-main game-key" data-code="ok" aria-label="Nút Hành Động Chính (OK / 5)">
+          OK
+          <span>CHỌN / 5</span>
+        </button>
+        <button class="action-btn-sec game-key" data-code="fire" aria-label="Nút Bắn / Phụ">
+          BẮN
+        </button>
+      </div>
+
+      <!-- End Key (Red) -->
+      <div class="aux-row">
+        <button class="aux-btn end game-key" data-code="end" aria-label="Phím Cúp / Hủy">
+          ✕ HỦY
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Slide-out Numpad Drawer -->
+  <aside id="numpad-drawer" aria-label="Bàn phím số cổ điển">
+    <div class="numpad-grid">
+      <button class="numpad-key" data-code="num1">1 <span>. , !</span></button>
+      <button class="numpad-key" data-code="num2">2 <span>ABC</span></button>
+      <button class="numpad-key" data-code="num3">3 <span>DEF</span></button>
+      <button class="numpad-key" data-code="num4">4 <span>GHI</span></button>
+      <button class="numpad-key" data-code="num5">5 <span>JKL</span></button>
+      <button class="numpad-key" data-code="num6">6 <span>MNO</span></button>
+      <button class="numpad-key" data-code="num7">7 <span>PQRS</span></button>
+      <button class="numpad-key" data-code="num8">8 <span>TUV</span></button>
+      <button class="numpad-key" data-code="num9">9 <span>WXYZ</span></button>
+      <button class="numpad-key" data-code="star">* <span>+</span></button>
+      <button class="numpad-key" data-code="num0">0 <span>␣</span></button>
+      <button class="numpad-key" data-code="pound"># <span>⇧</span></button>
+    </div>
+  </aside>
+
+  <!-- Portrait Helper Warning -->
+  <div id="portrait-warning">
+    <div class="rotate-device-anim"></div>
+    <h2>Vui lòng xoay ngang thiết bị</h2>
+    <p>Game J2ME hiển thị chuẩn nhất ở chế độ toàn màn hình ngang với 2 cụm phím 2 bên.</p>
+    <button class="rotate-btn" onclick="J2MEPlayerControls.toggleLandscapeMode()">
+      🔄 Giả Lập Xoay Ngang
+    </button>
+  </div>
+
+  <!-- Player Controller Logic -->
+  <script src="js/player-controls.js"></script>
+</body>
+</html>
